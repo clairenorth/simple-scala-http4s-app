@@ -1,0 +1,50 @@
+---
+applicationName: "simple-scala-app"
+pool: "{{.POOL}}"
+environment: "{{.ENV}}"
+loadBalancerConfigNameList:
+  - "insights-http4s"
+namespace: "bamtech"
+region: "{{.REGION}}"
+service:
+  minimumCapacity: 4
+  maximumCapacity: 8
+  scalingPolicies:
+    - metric: cpu
+      threshold: 75
+      thresholdType: upper
+      increment: 1
+      period: 60
+      evaluationPeriods: 3
+    - metric: cpu
+      threshold: 20
+      thresholdType: lower
+      increment: -1
+      period: 60
+      evaluationPeriods: 5
+task:
+  taskRole: "tr-insights"
+  containerDefinitions:
+    - cpu: 1024
+      memory: 2048
+      memoryReservation: 1024
+      disableNetworking: false
+      environment:
+        - name: "ENV"
+          value: "{{.ENV}}"
+        - name: "REGION"
+          value: "{{.REGION}}"
+        - name: "NAMESPACE"
+          value: "{{.NAMESPACE}}"
+        - name: "POOL"
+          value: "{{.POOL}}"
+        - name: "JAVA_OPTS"
+          value: "-XX:+PrintGCDetails -XX:+UseG1GC -XX:+UseStringDeduplication -Xmx1024m -Xms1024m -Dlogback.configurationFile=logback-datadog.xml"
+      essential: true
+      image: "insights.docker.artifactory.global.bamgrid.net/simple-scala-app:{{.VERSION}}"
+      name: "{{.NAMESPACE}}-{{.ENV}}-simple-scala-app"
+      portMappings:
+        - containerPort: 9000
+          hostPort: 0
+          protocol: "TCP"
+      readonlyRootfilesystem: false

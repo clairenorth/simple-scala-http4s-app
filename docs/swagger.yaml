@@ -1,0 +1,8 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: simple-scala-app API
+  description: TBD.
+  contact:
+    name: Insights Engineering
+    email: insights@disneystreaming.com
